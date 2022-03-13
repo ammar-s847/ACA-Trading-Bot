@@ -1,2 +1,4 @@
 
 AV_API_KEY = ""
+MONGO_CONNECT = ""
+MONGO_DB_NAME = ""
