@@ -6,7 +6,15 @@ from pyspark.sql import SparkSession
 from pyspark.sql.types import StructField, StructType, StringType, DateType, DoubleType, BooleanType
 from pyspark.sql.functions import col, lit, lag
 from pyspark.sql.window import Window
-from transformer.main import spark_main as spark
+
+# Importing Local Modules
+import sys
+import os
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
+
+from main import spark_main as spark
+from config import AV_API_KEY
 
 '''
 spark = SparkSession \
@@ -14,9 +22,10 @@ spark = SparkSession \
         .appName('Trading Bot Pipeline') \
         .getOrCreate()
 '''
+
 if __name__ == "__main__":
         
-    url = 'https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol=ETH&market=USD&apikey='
+    url = f'https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol=ETH&market=USD&apikey={AV_API_KEY}'
     r = requests.get(url)
     raw_data = r.json()
     raw_data_time_series = raw_data['Time Series (Digital Currency Daily)']
