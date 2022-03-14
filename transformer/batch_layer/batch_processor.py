@@ -3,7 +3,14 @@ import pyspark
 import requests
 from datetime import datetime
 from pyspark.sql import SparkSession
-from pyspark.sql.types import StructField, StructType, StringType, DateType, DoubleType, BooleanType
+from pyspark.sql.types import (
+    StructField, 
+    StructType, 
+    StringType, 
+    DateType, 
+    DoubleType, 
+    BooleanType, 
+    TimestampType)
 from pyspark.sql.functions import col, lit, lag
 from pyspark.sql.window import Window
 
@@ -12,7 +19,6 @@ import sys
 import os
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
-
 from main import spark_main as spark
 from config import AV_API_KEY
 
@@ -23,46 +29,41 @@ spark = SparkSession \
         .getOrCreate()
 '''
 
-if __name__ == "__main__":
-        
-    url = f'https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol=ETH&market=USD&apikey={AV_API_KEY}'
-    r = requests.get(url)
-    raw_data = r.json()
-    raw_data_time_series = raw_data['Time Series (Digital Currency Daily)']
+url = f'https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol=ETH&market=USD&apikey={AV_API_KEY}'
+r = requests.get(url)
+raw_data = r.json()
+raw_data_time_series = raw_data['Time Series (Digital Currency Daily)']
 
-    schema = StructType([ \
-        StructField("cap", StringType(), True), \
-        StructField("close", StringType(), True), \
-        StructField("datetime", StringType(), True), \
-        StructField("high", StringType(), True), \
-        StructField("low", StringType(), True), \
-        StructField("open", StringType(), True), \
-        StructField("volume", StringType(), True) \
-    ])
+schema = StructType([
+    StructField("close", StringType(), True), \
+    StructField("datetime", StringType(), True), \
+    StructField("high", StringType(), True), \
+    StructField("low", StringType(), True), \
+    StructField("open", StringType(), True), \
+    StructField("volume", StringType(), True) \
+])
 
-    data_dict = []
+data_dict = []
 
-    for k, v in raw_data_time_series.items():
-        data_dict.append({
-            'datetime': k,
-            'open': v['1a. open (USD)'],
-            'high': v['2a. high (USD)'],
-            'low': v['3a. low (USD)'],
-            'close': v['4a. close (USD)'],
-            'volume': v['5. volume'],
-            'cap': v['6. market cap (USD)']
-        })
+for k, v in raw_data_time_series.items():
+    data_dict.append({
+        'datetime': k,
+        'open': v['1a. open (USD)'],
+        'high': v['2a. high (USD)'],
+        'low': v['3a. low (USD)'],
+        'close': v['4a. close (USD)'],
+        'volume': v['5. volume']
+    })
 
-    df = spark.createDataFrame(data_dict, schema=schema)
+df = spark.createDataFrame(data_dict, schema=schema)
 
-    df = df.withColumn('cap', col('cap').cast('Double')) \
-        .withColumn('open', col('open').cast('Double')) \
-        .withColumn('close', col('close').cast('Double')) \
-        .withColumn('high', col('high').cast('Double')) \
-        .withColumn('low', col('low').cast('Double')) \
-        .withColumn('volume', col('volume').cast('Double')) \
-        .withColumn("datetime", col("datetime").cast(DateType()))
+df = df.withColumn('open', col('open').cast('Double')) \
+    .withColumn('close', col('close').cast('Double')) \
+    .withColumn('high', col('high').cast('Double')) \
+    .withColumn('low', col('low').cast('Double')) \
+    .withColumn('volume', col('volume').cast('Double')) \
+    .withColumn("datetime", col("datetime").cast(TimestampType()))
 
-    print("\n\n")
-    print(df)
-    print("\n\n")
+print("\n\n")
+print(df)
+print("\n\n")
