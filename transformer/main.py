@@ -22,11 +22,6 @@ spark_main = SparkSession \
              .getOrCreate()
             # .master("local") \
 
-# sc = SparkContext()
-# ssc = StreamingContext(sc, 10)
-# sql_context = SQLContext(sc)
-
-
 consumer = KafkaConsumer(
     KAFKA_TOPICS['eth-hourly'],
     bootstrap_servers=[f'{KAFKA_HOST}:{KAFKA_PORT}'],

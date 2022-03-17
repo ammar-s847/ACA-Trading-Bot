@@ -1,7 +1,6 @@
-import requests, websockets, time, json, schedule
+import requests, time, json, schedule
 from datetime import datetime
 from kafka import KafkaProducer
-import random
 
 from config import AV_API_KEY, KAFKA_HOST, KAFKA_PORT, KAFKA_TOPICS
 from scripts.eth_hourly import eth_hourly
@@ -27,5 +26,8 @@ producer = KafkaProducer(
 )
 
 if __name__ == "__main__":
-    # producer.send(KAFKA_TOPICS['eth-hourly'], eth_hourly(AV_API_KEY))
-    pass
+    schedule.every(1).hours.do(
+        producer.send, 
+        topic = KAFKA_TOPICS['eth-hourly'], 
+        value = eth_hourly(AV_API_KEY)
+    )

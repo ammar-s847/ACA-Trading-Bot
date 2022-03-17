@@ -1,4 +1,4 @@
-import requests, json
+import requests
 
 def eth_hourly(api_key: str) -> dict:
     url = f"https://www.alphavantage.co/query?function=CRYPTO_INTRADAY&symbol=ETH&market=USD&interval=60min&outputsize=full&apikey={api_key}"
@@ -16,5 +16,3 @@ def eth_hourly(api_key: str) -> dict:
     
 def eth_hourly_full(api_key: str) -> list:
     url = f"https://www.alphavantage.co/query?function=CRYPTO_INTRADAY&symbol=ETH&market=USD&interval=60min&outputsize=full&apikey={api_key}"
-
-eth_hourly('68ZFL562SH8P1EZU')
