@@ -27,11 +27,11 @@ spark_main = SparkSession \
 # sql_context = SQLContext(sc)
 
 
-# consumer = KafkaConsumer(
-#     KAFKA_TOPICS['eth-hourly'],
-#     bootstrap_servers=[f'{KAFKA_HOST}:{KAFKA_PORT}'],
-#     auto_offset_reset='earliest' # 'latest' or 'earliest'
-# )
+consumer = KafkaConsumer(
+    KAFKA_TOPICS['eth-hourly'],
+    bootstrap_servers=[f'{KAFKA_HOST}:{KAFKA_PORT}'],
+    auto_offset_reset='earliest' # 'latest' or 'earliest'
+)
 
 print("Start -----------------")
 
@@ -46,6 +46,7 @@ if __name__ == "__main__":
 
     #spark.sparkContext.setLogLevel("ERROR")
 
+    '''
     df = spark_main \
         .readStream \
         .format("kafka") \
@@ -54,3 +55,4 @@ if __name__ == "__main__":
         .option("startingOffsets", "earliest") \
         .load()
     print(df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)"))
+    '''
