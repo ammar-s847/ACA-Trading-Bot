@@ -25,7 +25,7 @@ spark_main = SparkSession \
 consumer = KafkaConsumer(
     KAFKA_TOPICS['eth-hourly'],
     bootstrap_servers=[f'{KAFKA_HOST}:{KAFKA_PORT}'],
-    auto_offset_reset='earliest' # 'latest' or 'earliest'
+    auto_offset_reset='latest' # 'latest' or 'earliest'
 )
 
 print("Start -----------------")
@@ -34,19 +34,17 @@ if __name__ == "__main__":
 
     if spark_main:
         print("Successfully initialized Spark Session")
+        spark_main.sparkContext.setLogLevel("FATAL")
 
-    # for message in consumer:
-    #     print(message)
-    #     #print(str(json.loads(message)))
-
-    #spark.sparkContext.setLogLevel("ERROR")
+    for message in consumer:
+        print(json.loads(message.value.decode('UTF-8')))
 
     '''
     df = spark_main \
         .readStream \
         .format("kafka") \
         .option("kafka.bootstrap.servers", f"{KAFKA_HOST}:{KAFKA_PORT}") \
-        .option("subscribe", 'messages1') \
+        .option("subscribe", KAFKA_TOPICS['eth-hourly']) \
         .option("startingOffsets", "earliest") \
         .load()
     print(df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)"))
