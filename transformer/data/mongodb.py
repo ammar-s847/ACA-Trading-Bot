@@ -8,11 +8,11 @@ sys.path.append(os.path.dirname(SCRIPT_DIR))
 from config import MONGO_CONNECT, MONGO_DB_NAME
 
 # DAO (Data Access Object)
-class MongoDBConnect():
-    def __init__(self, connection_string: str):
-        self.conn = connection_string
-        self.mongo = MongoClient(MONGO_CONNECT)
-        self.db = self.mongo.get_database(MONGO_DB_NAME)
+class MongoDBHandler():
+    def __init__(self, connection_string: str, db_name: str):
+        #self.conn = connection_string
+        self.mongo = MongoClient(connection_string)
+        self.db = self.mongo.get_database(db_name)
     
     def get_single_day_time_series(self, symbol: str, ) -> dict:
         pass
