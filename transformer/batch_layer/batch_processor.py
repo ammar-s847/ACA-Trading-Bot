@@ -20,14 +20,23 @@ import os
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 from main import spark_main as spark
-from config import AV_API_KEY
+from config import *
+from data.mongodb import MongoDBHandler
 
-'''
-spark = SparkSession \
-        .builder \
-        .appName('Trading Bot Pipeline') \
-        .getOrCreate()
-'''
+default_db_handler = MongoDBHandler(MONGO_CONNECT, MONGO_DB_NAME)
+
+def batch_eth_hourly(
+        batch_data: list, 
+        db_handler: MongoDBHandler = default_db_handler
+    ) -> None:
+    '''
+    - clean batch data
+    - retrain on model
+    - validate new training data
+    - calculate moving average
+    - store results on db
+    '''
+    pass
 
 url = f'https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol=ETH&market=USD&apikey={AV_API_KEY}'
 r = requests.get(url)
@@ -63,7 +72,3 @@ df = df.withColumn('open', col('open').cast('Double')) \
     .withColumn('low', col('low').cast('Double')) \
     .withColumn('volume', col('volume').cast('Double')) \
     .withColumn("datetime", col("datetime").cast(TimestampType()))
-
-print("\n\n")
-print(df)
-print("\n\n")
