@@ -48,7 +48,7 @@ def train_new_seq_LSTM_model(dataset, format=["open", "high", "low", "close", "v
     ])
 
     model.compile(
-        optimizer = Adam(learning_rate=0.0001),
+        optimizer = Adam(learning_rate=0.001),
         loss = 'mse',
         metrics = ['mae', 'mape']
     )
@@ -83,7 +83,8 @@ def train_new_bi_LSTM_model():
     '''
     pass
 
-def retrain_model():
+
+def retrain_model(model, new_dataset):
     '''
     Predict one data point ahead
 
@@ -91,5 +92,29 @@ def retrain_model():
     - model
     - data points
     '''
+    
+    pandasDF = new_dataset.toPandas()
 
-    pass
+    time_step=75
+    X_new, y_new = create_dataset(pandasDF, time_step)
+
+    model.compile(
+        optimizer = Adam(learning_rate=0.001),
+        loss = 'mse',
+        metrics = ['mae', 'mape']
+    )
+
+    model.fit(
+        X_new,
+        y_new,
+        epochs = 30,
+        batch_size = 30,
+        verbose = 2,
+        #callbacks = [callback],
+        #validation_data=(
+           # X_val, 
+           # y_val
+           # )
+    )
+
+    return model
