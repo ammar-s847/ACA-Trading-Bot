@@ -15,6 +15,8 @@ import os
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 from config import *
+from streaming_layer.consumer_handlers import handle_eth_hourly
+from batch_layer.batch_processor import batch_eth_hourly
 
 spark_main = SparkSession \
              .builder \
@@ -37,7 +39,12 @@ if __name__ == "__main__":
         spark_main.sparkContext.setLogLevel("FATAL")
 
     for message in consumer:
-        print(json.loads(message.value.decode('UTF-8')))
+        message_dict = json.loads(message.value.decode('UTF-8'))
+        print(message_dict)
+        if message_dict['format'] == 'hour':
+            handle_eth_hourly(message_dict)
+        elif message_dict['format'] == 'train':
+            pass
 
     '''
     df = spark_main \
