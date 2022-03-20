@@ -16,7 +16,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 from config import *
 from streaming_layer.consumer_handlers import handle_eth_hourly
-from batch_layer.batch_processor import batch_eth_hourly
+from batch_layer.batch_processor import batch_eth_hourly, gather_local_cached_data
 
 spark_main = SparkSession \
              .builder \
@@ -29,6 +29,12 @@ consumer = KafkaConsumer(
     bootstrap_servers=[f'{KAFKA_HOST}:{KAFKA_PORT}'],
     auto_offset_reset='latest' # 'latest' or 'earliest'
 )
+
+# Scheduling daily batch job
+# schedule.every(24).hours.do(
+#     batch_eth_hourly, 
+#     batch_data = gather_local_cached_data("data/cached_eth_hourly.json")
+# )
 
 print("Start -----------------")
 
@@ -46,6 +52,9 @@ if __name__ == "__main__":
         elif message_dict['format'] == 'train':
             pass
 
+    # Find a way to run this scheduled job loop seperately (multiprocessing?)
+    # while True:
+    #     schedule.run_pending()
     '''
     df = spark_main \
         .readStream \
