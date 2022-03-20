@@ -4,6 +4,7 @@ import json
 import pyspark
 import schedule
 from datetime import datetime
+from multiprocessing import Process
 from pyspark.sql import SparkSession
 from pyspark import SparkContext, SQLContext
 from pyspark.streaming import StreamingContext
@@ -31,10 +32,17 @@ consumer = KafkaConsumer(
 )
 
 # Scheduling daily batch job
-# schedule.every(24).hours.do(
-#     batch_eth_hourly, 
-#     batch_data = gather_local_cached_data("data/cached_eth_hourly.json")
-# )
+schedule.every(24).hours.do(
+    batch_eth_hourly, 
+    batch_data = gather_local_cached_data("data/cached_eth_hourly.json")
+)
+
+def scheduled_tasks_loop():
+    while True:
+        schedule.run_pending()
+
+# Using Multiprocessing to run batch scheduler loop outside main consumer loop
+batch_process = Process(target=scheduled_tasks_loop)
 
 print("Start -----------------")
 
@@ -44,18 +52,18 @@ if __name__ == "__main__":
         print("Successfully initialized Spark Session")
         spark_main.sparkContext.setLogLevel("FATAL")
 
+    batch_process.start()
+
     for message in consumer:
         message_dict = json.loads(message.value.decode('UTF-8'))
         print(message_dict)
         if message_dict['format'] == 'hour':
             handle_eth_hourly(message_dict)
         elif message_dict['format'] == 'train':
-            pass
+            pass # train the initial data using model functions
 
-    # Find a way to run this scheduled job loop seperately (multiprocessing?)
-    # while True:
-    #     schedule.run_pending()
     '''
+    ----- Spark Streaming (Hadoop environment required) -----
     df = spark_main \
         .readStream \
         .format("kafka") \
