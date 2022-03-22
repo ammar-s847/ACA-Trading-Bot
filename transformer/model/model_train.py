@@ -6,16 +6,20 @@ from keras.models import Sequential
 from keras.layers import LSTM, Bidirectional, Embedding, Dense
 from keras import Model, Input
 from keras.optimizers import Adam
+from pyspark.sql.dataframe import DataFrame as SparkDataFrame
 
-def create_dataset(dataset, time_step, offset=0):
+def create_dataset(dataset, time_step, offset = 0):
     x_train, y_train = [], []
     for i in range(time_step, len(dataset)):
         x_train.append(dataset[i-time_step:i])
         y_train.append(dataset['close'][i + offset])
     return np.array(x_train), np.array(y_train)
     
-
-def train_new_seq_LSTM_model(dataset, format=["open", "high", "low", "close", "volume"], model_name="eth_hourly_seq_LSTM"):
+def train_new_seq_LSTM_model(
+        dataset: SparkDataFrame, 
+        format = ["open", "high", "low", "close", "volume"], 
+        model_name = "eth_hourly_seq_LSTM"
+    ):
     '''
     Predict one data point ahead
 
@@ -62,10 +66,10 @@ def train_new_seq_LSTM_model(dataset, format=["open", "high", "low", "close", "v
         batch_size = 30,
         verbose = 2,
         callbacks = [callback],
-        validation_data=(
+        validation_data = (
             X_val, 
             y_val
-            )
+        )
     )
 
     model = tf.keras.models.load_model('cached_models\\' + model_name + '.hdf5')
@@ -86,11 +90,12 @@ def train_new_bi_LSTM_model():
 
 def retrain_model(model, new_dataset):
     '''
-    Predict one data point ahead
+    Compare newly trained model to existing one for validation improvement
+    and save new one if it works better
 
     Arguments:
     - model
-    - data points
+    - new dataset
     '''
     
     pandasDF = new_dataset.toPandas()
@@ -110,11 +115,11 @@ def retrain_model(model, new_dataset):
         epochs = 30,
         batch_size = 30,
         verbose = 2,
-        #callbacks = [callback],
-        #validation_data=(
-           # X_val, 
-           # y_val
-           # )
+        # callbacks = [callback],
+        # validation_data=(
+        #     X_val, 
+        #     y_val
+        # )
     )
 
     return model

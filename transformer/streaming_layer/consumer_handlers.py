@@ -1,4 +1,12 @@
 # from kafka import ConsumerRecord
+from pyspark.sql.types import (
+    StructField, 
+    StructType, 
+    StringType, 
+    DateType, 
+    DoubleType, 
+    BooleanType, 
+    TimestampType)
 
 # Importing Local Modules
 import sys
@@ -22,3 +30,19 @@ def handle_eth_hourly(
     '''
 
     pass
+
+def handle_eth_hourly_train_data(message: dict) -> None:
+    '''
+    - Converts kafka training message data to spark df
+    - Cleans and filters data
+    - Trains new model
+    '''
+    schema = StructType([
+        StructField("close", StringType(), True), \
+        StructField("datetime", StringType(), True), \
+        StructField("high", StringType(), True), \
+        StructField("low", StringType(), True), \
+        StructField("open", StringType(), True), \
+        StructField("volume", StringType(), True) \
+    ])
+    
