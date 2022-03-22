@@ -16,8 +16,9 @@ import os
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 from config import *
-from streaming_layer.consumer_handlers import handle_eth_hourly
+from streaming_layer.consumer_handlers import handle_eth_hourly, handle_eth_hourly_train_data
 from batch_layer.batch_processor import batch_eth_hourly, gather_local_cached_data
+from model.model_train import train_new_seq_LSTM_model, train_new_bi_LSTM_model
 
 spark_main = SparkSession \
              .builder \
@@ -60,7 +61,7 @@ if __name__ == "__main__":
         if message_dict['format'] == 'hour':
             handle_eth_hourly(message_dict)
         elif message_dict['format'] == 'train':
-            pass # train the initial data using model functions
+            handle_eth_hourly_train_data(message_dict)
 
     '''
     ----- Spark Streaming (Hadoop environment required) -----

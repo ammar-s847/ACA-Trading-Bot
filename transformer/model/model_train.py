@@ -16,7 +16,7 @@ def create_dataset(dataset, time_step, offset = 0):
     return np.array(x_train), np.array(y_train)
     
 def train_new_seq_LSTM_model(
-        dataset, 
+        dataset: SparkDataFrame, 
         format = ["open", "high", "low", "close", "volume"], 
         model_name = "eth_hourly_seq_LSTM"
     ):
@@ -90,7 +90,8 @@ def train_new_bi_LSTM_model():
 
 def retrain_model(model, new_dataset):
     '''
-    Predict one data point ahead
+    Compare newly trained model to existing one for validation improvement
+    and save new one if it works better
 
     Arguments:
     - model
