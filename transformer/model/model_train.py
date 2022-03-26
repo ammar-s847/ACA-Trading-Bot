@@ -5,7 +5,7 @@ import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import LSTM, Bidirectional, Embedding, Dense
 from keras import Model, Input
-from keras.optimizers import Adam
+from keras.optimizers import adam_v2
 from pyspark.sql.dataframe import DataFrame as SparkDataFrame
 
 def create_dataset(dataset, time_step, offset = 0):
@@ -52,7 +52,7 @@ def train_new_seq_LSTM_model(
     ])
 
     model.compile(
-        optimizer = Adam(learning_rate=0.001),
+        optimizer = adam_v2.Adam(learning_rate=0.001),
         loss = 'mse',
         metrics = ['mae', 'mape']
     )
