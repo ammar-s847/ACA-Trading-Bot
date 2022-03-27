@@ -14,8 +14,13 @@ class MongoDBHandler():
         self.mongo = MongoClient(connection_string)
         self.db = self.mongo.get_database(db_name)
     
-    def get_single_day_time_series(self, symbol: str, ) -> dict:
-        pass
+    def get_single_day_time_series(self, symbol: str, date: str) -> dict:
+        table = self.db.hourly
+        check = table.find_one({"symbol": symbol, "date" : date})
+        if check == None or len(check) == 0:
+            return None
+        else:
+            pass
 
     def get_all_data_for_symbol(self, symbol: str) -> dict:
         pass
