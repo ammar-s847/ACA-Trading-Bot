@@ -22,7 +22,6 @@ import sys
 import os
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
-from main import spark_main as spark
 from config import *
 from data.mongodb import MongoDBHandler
 from model.model_train import retrain_model
@@ -32,15 +31,9 @@ default_db_handler = MongoDBHandler(MONGO_CONNECT, MONGO_DB_NAME)
 def gather_local_cached_data(file_name: str) -> list:
     '''
     gather the locally cached data points (json format) to be used for batch processing
+    (obtains a single day of data -> 24 hours)
     '''
-    schema = StructType([
-        StructField("close", StringType(), True), \
-        StructField("datetime", StringType(), True), \
-        StructField("high", StringType(), True), \
-        StructField("low", StringType(), True), \
-        StructField("open", StringType(), True), \
-        StructField("volume", StringType(), True) \
-    ])
+    pass
 
 def batch_eth_hourly(
         batch_data: list, 
@@ -54,6 +47,16 @@ def batch_eth_hourly(
     - store results on db
     '''
     
+    # Convert item list into dataframe
+    schema = StructType([
+        StructField("close", StringType(), True), \
+        StructField("datetime", StringType(), True), \
+        StructField("high", StringType(), True), \
+        StructField("low", StringType(), True), \
+        StructField("open", StringType(), True), \
+        StructField("volume", StringType(), True) \
+    ])
+
     # Handling Data types
     df = batch_data.withColumn('open', col('open').cast('Double')) \
     .withColumn('close', col('close').cast('Double')) \
@@ -63,15 +66,15 @@ def batch_eth_hourly(
     .withColumn("datetime", col("datetime").cast(TimestampType()))
 
     # Handling empty and duplicate values
-
+    df = df.na.drop()
 
     # Storing batch into database (calculate daily moving average?)
-
 
     # Normalizing data for training
     assembler = VectorAssembler(
         inputCols = ["open", "high", "low", "close", "volume"],
-        outputCol = "vector")
+        outputCol = "vector"
+    )
     scaler = MinMaxScaler(outputCol="scaled")
     scaler.setInputCol("vector")
     pipeline = Pipeline(stages=[assembler, scaler])
