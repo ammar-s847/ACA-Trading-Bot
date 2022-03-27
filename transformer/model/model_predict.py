@@ -3,7 +3,7 @@ import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import LSTM, Bidirectional, Embedding, Dense
 from keras import Model, Input
-from keras.optimizers import Adam
+#from tensorflow.keras.optimizers import adam_v2
 from pyspark.sql.dataframe import DataFrame as SparkDataFrame
 
 # Importing Local Modules
@@ -11,7 +11,7 @@ import sys
 import os
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
-import model_train
+import model.model_train as model_train
 
 def predict_one(
         model, 
