@@ -131,7 +131,7 @@ def train_new_bi_LSTM_model(
     callback = tf.keras.callbacks.ModelCheckpoint('cached_models\\' + model_name + '.hdf5', monitor='mape', save_best_only=True, verbose=1)
 
     model.compile(
-        optimizer = Adam(learning_rate=0.001),
+        optimizer = adam_v2.Adam(learning_rate=0.001),
         loss = 'mse',
         metrics = ['mae', 'mape']
     )
@@ -168,7 +168,7 @@ def retrain_model(model, new_dataset):
     X_new, y_new = create_dataset(pandasDF, time_step)
 
     model.compile(
-        optimizer = Adam(learning_rate=0.001),
+        optimizer = adam_v2.Adam(learning_rate=0.001),
         loss = 'mse',
         metrics = ['mae', 'mape']
     )
