@@ -17,7 +17,6 @@ def predict_one(
         model, 
         dataset: SparkDataFrame, 
         format = ["open", "high", "low", "close", "volume"],
-        time_step = 75
     ):
     '''
     Predict one data point ahead
@@ -29,8 +28,7 @@ def predict_one(
     - interval (optional)
     '''
     pandasDF = dataset.toPandas()
-
-    X_pred, y_pred = model_train.create_dataset(pandasDF[format], time_step)
+    X_pred = pandasDF.to_numpy()
 
     prediction = model.predict(X_pred)
 
