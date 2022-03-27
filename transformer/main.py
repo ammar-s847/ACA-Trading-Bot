@@ -29,7 +29,7 @@ spark_main = SparkSession \
 consumer = KafkaConsumer(
     KAFKA_TOPICS['eth-hourly'],
     bootstrap_servers=[f'{KAFKA_HOST}:{KAFKA_PORT}'],
-    auto_offset_reset='latest' # 'latest' or 'earliest'
+    auto_offset_reset='earliest' # 'latest' or 'earliest'
 )
 
 # Scheduling daily batch job

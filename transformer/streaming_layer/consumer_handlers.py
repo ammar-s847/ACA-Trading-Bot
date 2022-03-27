@@ -6,7 +6,8 @@ from pyspark.sql.types import (
     DateType, 
     DoubleType, 
     BooleanType, 
-    TimestampType)
+    TimestampType
+)
 
 # Importing Local Modules
 import sys
@@ -28,7 +29,6 @@ def handle_eth_hourly(
     - generates prediction
     - updates/adds day record in MongoDB
     '''
-
     pass
 
 def handle_eth_hourly_train_data(message: dict) -> None:
