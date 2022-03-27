@@ -152,7 +152,11 @@ def train_new_bi_LSTM_model(
     return model
 
 
-def retrain_model(model, new_dataset):
+def retrain_model(
+        model, 
+        new_dataset: SparkDataFrame, 
+        model_name = "eth_hourly_seq_Bi-LSTM"
+    ):
     '''
     Compare newly trained model to existing one for validation improvement
     and save new one if it works better
@@ -172,6 +176,8 @@ def retrain_model(model, new_dataset):
         loss = 'mse',
         metrics = ['mae', 'mape']
     )
+
+    # callback = tf.keras.callbacks.ModelCheckpoint('cached_models\\' + model_name + '.hdf5', monitor='mape', save_best_only=True, verbose=1)
 
     model.fit(
         X_new,

@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import LSTM, Bidirectional, Embedding, Dense
@@ -14,6 +15,19 @@ sys.path.append(os.path.dirname(SCRIPT_DIR))
 import model.model_train as model_train
 
 def predict_one(
+        model, 
+        dataset: np.ndarray
+    ):
+    '''
+    Predict one data point ahead (using Numpyy array as input)
+
+    Arguments:
+    - model
+    - dataset
+    '''
+    return model.predict(dataset)
+
+def predict_one_with_spark_df(
         model, 
         dataset: SparkDataFrame, 
         format = ["open", "high", "low", "close", "volume"],
