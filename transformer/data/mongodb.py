@@ -14,16 +14,59 @@ class MongoDBHandler():
         self.mongo = MongoClient(connection_string)
         self.db = self.mongo.get_database(db_name)
     
-    def get_single_day_time_series(self, symbol: str, date: str) -> dict:
-        table = self.db.hourly
-        check = table.find_one({"symbol": symbol, "date" : date})
-        if check == None or len(check) == 0:
+    def get_single_day_hourly_time_series(self, symbol: str, date: str) -> list:
+        try:
+            query = self.db.hourly.find({"symbol": symbol, "date" : date})
+            return query
+        except:
             return None
-        else:
-            pass
 
-    def get_all_data_for_symbol(self, symbol: str) -> dict:
-        pass
+    def get_all_hourly_data_for_symbol(self, symbol: str) -> list:
+        try:
+            query = self.db.hourly.find({"symbol": symbol})
+            return query
+        except:
+            return None
 
-    def update_single_day_time_series(self, symbol: str, new_data: dict) -> dict:
-        pass
+    def add_new_hourly_data_point(self, data: dict) -> None:
+        '''
+        data format:
+        {
+            symbol: str,
+            date: str,
+            time: str,
+            OHLCV: {
+                open: float
+                high: float
+                low: float
+                close: float
+                volume: float
+            }
+        }
+        '''
+        check = self.db.hourly.find_one(
+            {
+                "symbol": data['symbol'],
+                "date": data['date'],
+                "time": data['time']
+            }
+        )
+        if check == None or len(check) == 0: # check if already exists
+            self.db.hourly.insert_one(data)
+
+    def add_new_hourly_prediction(self, data: dict) -> None:
+        '''
+        data format:
+        {
+            symbol: str,
+            date: str,
+            time: str,
+            predicted_close: float/double
+        }
+        '''
+        check = self.db.hourly.find_one(data)
+        if check == None or len(check) == 0: # check if already exists
+            self.db.predicted_hourly.insert_one(data)
+
+    # def update_single_day_time_series(self, symbol: str, new_data: dict) -> dict:
+    #     pass
